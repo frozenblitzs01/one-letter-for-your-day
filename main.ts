@@ -11,5 +11,19 @@ import { mkdirSync, writeFileSync } from "node:fs";
 
 const LETTER = "G"; // G for grinding
 
+// Validation guard: the entry must be exactly one letter, A-Z.
+// Anything else (a word, punctuation, whitespace, an empty string)
+// is rejected before anything is written.
+if (!/^[A-Z]$/.test(LETTER)) {
+  throw new Error(`Invalid entry: expected exactly one A-Z letter, got ${JSON.stringify(LETTER)}`);
+}
+
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", LETTER, "utf8");
+
+// Verify what was written, so a bad write can never pass silently.
+import { readFileSync } from "node:fs";
+const written = readFileSync("/output/entry.txt", "utf8");
+if (written !== LETTER) {
+  throw new Error(`Write verification failed: expected ${JSON.stringify(LETTER)}, got ${JSON.stringify(written)}`);
+}
